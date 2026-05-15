@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Add Review</title>
-
+    <!--Settings of html view-->
     <style>
+        /* sets background and font */
         body {
             background-color: #e7eabf;
             font-family: Impact, fantasy;
         }
 
+        /* sets container options */
         .container {
             width: 500px;
             margin: 80px auto;
@@ -20,12 +22,14 @@
             text-align: center;
         }
 
+        /* Settings for dropdown */
         select {
             width: 90%;
             padding: 8px;
             margin: 10px 0;
         }
 
+        /* question group settings */
         .question-group {
             text-align: left;
             margin-top: 20px;
@@ -38,6 +42,7 @@
             font-size: 16px;
         }
 
+        /* for the answers of suvey the "fill in the bubble"*/
         .radio-group {
             margin-left: 20px;
             margin-top: 5px;
@@ -47,6 +52,7 @@
             margin-right: 5px;
         }
 
+        /* Settings for buttons used */
         button {
             margin-top: 25px;
             padding: 10px 20px;
@@ -68,11 +74,17 @@
             text-align: left;
         }
 
+        /* dashboard link */
         a {
             display: inline-block;
             margin-top: 20px;
             text-decoration: none;
             color: black;
+        }
+
+
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -81,16 +93,18 @@
 
 <div class="container">
 
+    <!-- Header -->
     <h2>Add Product Review</h2>
 
+    <!-- Sends data to flask route  -->
     <form method="POST">
 
         <label><strong>Select Product:</strong></label><br>
 
         <select name="product_id" required>
-            {% for product in products %}
+            {% for product, brand in products %}
                 <option value="{{ product.product_id }}">
-                    {{ product.product_name }}
+                    {{brand.brand_name }} - {{ product.product_name }}
                 </option>
             {% endfor %}
         </select>
@@ -141,12 +155,12 @@
 
     <div class="info">
         <strong>Review Guide:</strong><br>
-        • Breakout → caused acne or irritation<br>
-        • Drying → made skin feel dry/tight<br>
-        • Oily → caused excess shine<br>
-        • Hydrating → helped moisture balance<br>
-        • Heavy → felt thick or greasy<br>
-        • Recommend → would use again
+        • Breakout : caused acne or irritation<br>
+        • Drying : made skin feel dry/tight<br>
+        • Oily : caused excess shine<br>
+        • Hydrating : helped moisture balance<br>
+        • Heavy : felt thick or greasy<br>
+        • Recommend : would use again
     </div>
 
     <a href="{{ url_for('dashboard') }}">DASHBOARD</a>

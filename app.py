@@ -29,7 +29,7 @@ class APP_USER(db.Model):
     user_email = db.Column(db.String(80), unique=True, nullable=False)
     user_fname = db.Column(db.String(64), nullable=True)
     user_lname = db.Column(db.String(64), nullable=True)
-    user_passwd = db.Column(db.String(64), nullable=False)
+    user_passwd = db.Column(db.String(364), nullable=False)
     user_skin_type = db.Column(db.Integer, db.ForeignKey('SKIN_TYPE.skin_type_id'), nullable=True)
     user_loginTime = db.Column(db.DateTime, nullable=True)
     def __repr__(self):
@@ -68,6 +68,47 @@ class USER_PRODUCT(db.Model):
     heavy = db.Column(db.Boolean, default=False)
     recommend = db.Column(db.Boolean, default=False)
 
+class BRAND(db.Model):
+    __tablename__ = 'BRAND'
+
+    brand_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    brand_name = db.Column(db.String(64), unique=True, nullable=False)
+    def __repr__(self):
+        return f"<BRAND {self.brand_name}>"
+    
+class PRODUCT_CATEGORY(db.Model):
+    __tablename__ = 'PRODUCT_CATEGORY'
+
+    category_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    category_name = db.Column(db.String(64), unique=True, nullable=False)
+    category_description = db.Column(db.String(128))
+
+    def __repr__(self):
+        return f"<PRODUCT_CATEGORY {self.category_name}>"
+    
+class INGREDIENT(db.Model):
+    __tablename__ = 'INGREDIENT'
+
+    ingredient_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ingredient_name = db.Column(db.String(64), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f"<INGREDIENT {self.ingredient_name}>"
+    
+class PRODUCT_INGREDIENT(db.Model):
+    __tablename__ = 'PRODUCT_INGREDIENT'
+
+    product_id = db.Column(
+        db.Integer,
+        db.ForeignKey('PRODUCT.product_id'),
+        primary_key=True
+    )
+
+    ingredient_id = db.Column(
+        db.Integer,
+        db.ForeignKey('INGREDIENT.ingredient_id'),
+        primary_key=True
+    )    
 # when / used logs the log in to the site will redirect to the tables
 @app.route('/')
 def home():
@@ -231,30 +272,69 @@ def add_review():
         return redirect(url_for('dashboard'))
 
     # GET = show review page
-    products = PRODUCT.query.all()
+    products = db.session.query(PRODUCT, BRAND).join(
+        BRAND,
+        PRODUCT.product_brand_id == BRAND.brand_id
+    ).all()
 
     return render_template(
         'add_review.html',
         products=products
     )
 
-@app.route('/api/login', methods=['POST'])
-def api_login():
-    data = request.json
+@app.route('/recommendations')
+def recommendations():
 
-    email = data.get('user_email')
-    password = data.get('user_passwd')
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
 
-    user = APP_USER.query.filter_by(user_email=email).first()
+    user_id = session['user_id']
+    category_id = request.args.get('category_id')
 
-    if user and check_password_hash(user.user_passwd, password):
-        return jsonify({
-            "status": "success",
-            "user_id": user.user_id,
-            "email": user.user_email
-        })
-    
-    return jsonify({"status": "fail"}), 401
+    query = """
+        SELECT *
+        FROM FULL_RECOMMENDATIONS_VIEW
+        WHERE target_user = :user_id
+    """
+
+    if category_id:
+        query += " AND category_id = :category_id"
+
+    params = {"user_id": user_id}
+
+    if category_id:
+        params["category_id"] = category_id
+
+    results = db.session.execute(
+        db.text(query),
+        params
+    ).fetchall()
+
+    # fallback
+    if not results:
+
+        query2 = """
+            SELECT *
+            FROM FULL_SKINTYPE_RECOMMENDATIONS
+            WHERE target_user = :user_id
+        """
+
+        if category_id:
+            query2 += " AND category_id = :category_id"
+
+        results = db.session.execute(
+            db.text(query2),
+            params
+        ).fetchall()
+
+    categories = PRODUCT_CATEGORY.query.all()
+
+    return render_template(
+        "recommendations.html",
+        products=results,
+        categories=categories,
+        selected_category=category_id
+    )
 
 if __name__ == "__main__":
     #app.run(debug = True)
