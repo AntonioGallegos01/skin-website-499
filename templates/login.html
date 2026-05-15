@@ -54,6 +54,14 @@
             text-decoration: none;
         }
 
+        .error-message {
+            background-color: #ffcccc;
+            color: darkred;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
         a:hover {
             text-decoration: underline;
         }
@@ -64,6 +72,12 @@
 
 <div class="container">
     <h2>Login</h2>
+
+    {% if error %}
+        <div class="error-message">
+            {{ error }}
+        </div>
+    {% endif %}
 
     <form method="POST">
         <input type="email" name="user_email" placeholder="Email" required><br>

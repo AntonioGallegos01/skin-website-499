@@ -13,8 +13,9 @@ app.secret_key = 'super_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://antoniog_skin:Jan122001%21@antoniogallegos063.cikeys.com/antoniog_skin'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-
+#--------------------------------------------------------------------------------------------------------------------------------------------------------
 # DEFINES TABLES HERE
+# SKIN_TYPE structure from database
 class SKIN_TYPE(db.Model):
     __tablename__ = 'SKIN_TYPE'
     skin_type_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -22,7 +23,8 @@ class SKIN_TYPE(db.Model):
     skin_type_description = db.Column(db.String(124))
     def __repr__(self):
         return f"<SKIN_TYPE {self.skin_type_name}>"
-    
+
+#APP_USER structure from database 
 class APP_USER(db.Model):
     __tablename__ = 'APP_USER'
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -34,27 +36,23 @@ class APP_USER(db.Model):
     user_loginTime = db.Column(db.DateTime, nullable=True)
     def __repr__(self):
         return f"<APP_USER {self.user_email}>"
-    
+ 
+# PRODUCT structure from database
 class PRODUCT(db.Model):
     __tablename__ = 'PRODUCT'
 
     product_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-
     product_name = db.Column(db.String(80), nullable=False)
-
     product_brand_id = db.Column(db.Integer,db.ForeignKey('BRAND.brand_id'),nullable=True)
-
     product_category = db.Column(db.Integer,db.ForeignKey('PRODUCT_CATEGORY.category_id'),nullable=True)
-
     product_skin_type = db.Column(db.Integer,db.ForeignKey('SKIN_TYPE.skin_type_id'),nullable=True)
-
     product_upc = db.Column(db.String(20), unique=True, nullable=True)
-
     product_release = db.Column(db.Date, nullable=True)
 
     def __repr__(self):
         return f"<PRODUCT {self.product_name}>"
-    
+
+#USER_PRODUCT structure from database    
 class USER_PRODUCT(db.Model):
     __tablename__ = 'USER_PRODUCT'
 
@@ -68,6 +66,7 @@ class USER_PRODUCT(db.Model):
     heavy = db.Column(db.Boolean, default=False)
     recommend = db.Column(db.Boolean, default=False)
 
+#BRAND structure from database
 class BRAND(db.Model):
     __tablename__ = 'BRAND'
 
@@ -76,6 +75,7 @@ class BRAND(db.Model):
     def __repr__(self):
         return f"<BRAND {self.brand_name}>"
     
+#PRODUCT_CATEGORY structure from database    
 class PRODUCT_CATEGORY(db.Model):
     __tablename__ = 'PRODUCT_CATEGORY'
 
@@ -85,7 +85,8 @@ class PRODUCT_CATEGORY(db.Model):
 
     def __repr__(self):
         return f"<PRODUCT_CATEGORY {self.category_name}>"
-    
+
+#INGREDIENT structure from database    
 class INGREDIENT(db.Model):
     __tablename__ = 'INGREDIENT'
 
@@ -108,29 +109,39 @@ class PRODUCT_INGREDIENT(db.Model):
         db.Integer,
         db.ForeignKey('INGREDIENT.ingredient_id'),
         primary_key=True
-    )    
-# when / used logs the log in to the site will redirect to the tables
+    ) 
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------  
+# when / used logs the log in to the site will redirect to the home.html
 @app.route('/')
 def home():
     # Redirect to /tables
     return render_template('home.html')
-# the route to add users
+# the route to login
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
+    # if form gets submitted
     if request.method == 'POST':
+        # get the user input from html
         email = request.form.get('user_email')
         password = request.form.get('user_passwd')
-        # this checks the email and selects the first email on list
+        # finds matching email in databse
         user = APP_USER.query.filter_by(user_email=email).first()
 
+        # checks if the hashed password matches with stored hash
         if user and check_password_hash(user.user_passwd, password):
-            #store theu user info in session 
+            #store the user info in session 
             session['user_id'] = user.user_id
             session['user_email'] = user.user_email
-
+            
+            # take to dashboard 
             return redirect(url_for('dashboard'))
         else:
-            return "Invalid email or password"
+             return render_template(
+                'login.html',
+                error="Invalid email or password"
+            )
+    #what the user sees first
     return render_template('login.html')
 
 @app.route('/add_user', methods=['GET', 'POST'])
@@ -158,12 +169,16 @@ def add_user():
             user_skin_type=user_skin_type,
             user_loginTime=user_loginTime
         )
-        # here added it the sql 
+        # here added it the sql inser into basically
         db.session.add(new_user)
         # Here basically commits it
         db.session.commit()
 
-        return redirect(url_for('list_users'))
+        # tags current sign up so they stay logged in
+        session['user_id'] = new_user.user_id
+        session['user_email'] = new_user.user_email
+        # redirected to dashboard since logged in
+        return redirect(url_for('dashboard'))
 
     # If GET, just show the HTML form
     skin_types = SKIN_TYPE.query.all()
@@ -193,35 +208,40 @@ def list_users():
 @app.route('/my_reviews')
 def my_reviews():
 
+    # makes sure a user is logged in if not redirect to login 
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
     user_id = session['user_id']
 
+    # this will hold text for the view we had made in mysql
     query = """
         SELECT *
         FROM user_product_review_view
         WHERE user_id = :user_id
     """
-
+    # this is actually executing
     reviews = db.session.execute(
         db.text(query),
         {"user_id": user_id}
     ).fetchall()
-
+    # what the user sees when opening page
     return render_template(
         'my_reviews.html',
         reviews=reviews
     )
 
+# dashboard
 @app.route('/dashboard')
 def dashboard():
+    # if user not logged in return to login if not then can proceed to dashboard
     if 'user_id' not in session:
         return redirect(url_for('login'))
     return render_template('dashboard.html')
 
 @app.route('/logout')
 def logout():
+    # logs out user and redirects to login page
     session.clear()
     return redirect(url_for('login'))
 
@@ -251,8 +271,18 @@ def add_review():
             product_id=product_id
         ).first()
 
-        if existing_review:
-            return "You already reviewed this product."
+        # logic for double review
+        if existing_review: 
+            products = db.session.query(PRODUCT, BRAND).join(
+                BRAND,
+                PRODUCT.product_brand_id == BRAND.brand_id
+            ).all()
+
+            return render_template(
+                'add_review.html',
+                products=products,
+                error="You already reviewed this product."
+            )
 
         # Create new review
         new_review = USER_PRODUCT(
@@ -284,19 +314,21 @@ def add_review():
 
 @app.route('/recommendations')
 def recommendations():
-
+    # checks if user is logged in
     if 'user_id' not in session:
         return redirect(url_for('login'))
-
+    # sets the user id to whatever is tagged
     user_id = session['user_id']
+    # gets filter from url
     category_id = request.args.get('category_id')
 
+    #
     query = """
         SELECT *
         FROM FULL_RECOMMENDATIONS_VIEW
         WHERE target_user = :user_id
     """
-
+    # adds the category for filtering purpose
     if category_id:
         query += " AND category_id = :category_id"
 
@@ -312,7 +344,7 @@ def recommendations():
 
     # fallback
     if not results:
-
+        # only checks similar skin types
         query2 = """
             SELECT *
             FROM FULL_SKINTYPE_RECOMMENDATIONS
