@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Reviews</title>
+
+    <style>
+        body {
+            background-color: #e7eabf;
+            font-family: Impact, fantasy;
+        }
+
+        .container {
+            width: 90%;
+            margin: 80px auto;
+            padding: 25px;
+            background-color: #d0d9a0;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #b8c97a;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        a:hover {
+            background-color: #45a049;
+        }
+
+        .info {
+            font-size: 12px;
+            color: gray;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>My Reviews</h2>
+
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Breakout</th>
+            <th>Drying</th>
+            <th>Oily</th>
+            <th>Hydrating</th>
+            <th>Heavy</th>
+            <th>Recommend</th>
+        </tr>
+
+        {% for review in reviews %}
+        <tr>
+            <td>{{ review.product_name }}</td>
+            <td>{{ review.breakout }}</td>
+            <td>{{ review.drying }}</td>
+            <td>{{ review.oily }}</td>
+            <td>{{ review.hydrating }}</td>
+            <td>{{ review.heavy }}</td>
+            <td>{{ review.recommend }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="info">
+        This page shows all your submitted product reviews.
+    </div>
+
+    <a href="{{ url_for('dashboard') }}">BACK TO DASHBOARD</a>
+
+</div>
+
+</body>
+</html>

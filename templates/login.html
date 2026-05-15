@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <style>
+        body {
+            background-color: #e7eabf;
+            font-family: Impact, fantasy;
+        }
+
+        .container {
+            width: 400px;
+            margin: 80px auto;
+            padding: 25px;
+            background-color: #d0d9a0;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+            margin: 8px 0;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .info {
+            font-size: 12px;
+            color: gray;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        a {
+            display: block;
+            margin-top: 10px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Login</h2>
+
+    <form method="POST">
+        <input type="email" name="user_email" placeholder="Email" required><br>
+        <input type="password" name="user_passwd" placeholder="Password" required><br>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="info">
+        <strong>Welcome Back 👋</strong><br>
+        Login to view your skin profile and recommended products.
+    </div>
+
+    <a href="{{ url_for('home') }}">HOMEPAGE</a>
+</div>
+
+</body>
+</html>

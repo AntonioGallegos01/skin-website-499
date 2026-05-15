@@ -1,0 +1,90 @@
+ <!DOCTYPE html>
+<html lang="en">
+<!-- This is for settings of the page-->
+<head>
+    <!-- charset allows emojis and accents -->
+    <meta charset="UTF-8">
+    <!--What browser tab sees-->
+    <title>Add User</title>
+
+    <!-- This for appearance-->
+    <style>
+        body {
+            background-color: #e7eabf;
+            font-family: Impact, fantasy;
+        }
+
+        .container {
+            width: 400px;
+            margin: 100px auto;
+            padding: 50px;
+            background-color: #d0d9a0;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        input, select {
+            width: 90%;
+            padding: 10px;
+            margin: 8px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .info {
+            font-size: 12px;
+            color: gray;
+            margin-top: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<!-- What the user sees-->
+<body>
+
+<div class="container">
+    <h2>Add User</h2>
+
+    <form method="POST">
+        <input type="email" name="user_email" placeholder="Email" required><br>
+        <input type="text" name="user_fname" placeholder="First Name"><br>
+        <input type="text" name="user_lname" placeholder="Last Name"><br>
+        <input type="password" name="user_passwd" placeholder="Password" required><br>
+
+        <label>Skin Type:</label><br>
+        <select name="user_skin_type" required>
+            {% for skin in skin_types %}
+                <option value="{{ skin.skin_type_id }}">
+                    {{ skin.skin_type_name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Add User</button>
+    </form>
+
+    <div class="info">
+        <strong>Skin Type Guide:</strong><br>
+        • Dry → feels tight, flaky<br>
+        • Combo → oily T-zone, dry cheeks<br>
+        • Oily → shiny, acne-prone
+    </div>
+    <a href="{{ url_for('home') }}">HOMEPAGE</a>
+</div>
+
+</body>
+</html>

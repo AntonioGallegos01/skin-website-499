@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Review</title>
+
+    <style>
+        body {
+            background-color: #e7eabf;
+            font-family: Impact, fantasy;
+        }
+
+        .container {
+            width: 500px;
+            margin: 80px auto;
+            padding: 25px;
+            background-color: #d0d9a0;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        select {
+            width: 90%;
+            padding: 8px;
+            margin: 10px 0;
+        }
+
+        .question-group {
+            text-align: left;
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+
+        .question-group label {
+            display: block;
+            margin-top: 12px;
+            font-size: 16px;
+        }
+
+        .radio-group {
+            margin-left: 20px;
+            margin-top: 5px;
+        }
+
+        .radio-group input {
+            margin-right: 5px;
+        }
+
+        button {
+            margin-top: 25px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .info {
+            font-size: 12px;
+            color: gray;
+            margin-top: 15px;
+            text-align: left;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Add Product Review</h2>
+
+    <form method="POST">
+
+        <label><strong>Select Product:</strong></label><br>
+
+        <select name="product_id" required>
+            {% for product in products %}
+                <option value="{{ product.product_id }}">
+                    {{ product.product_name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <div class="question-group">
+
+            <label>Did this product cause breakouts?</label>
+            <div class="radio-group">
+                <input type="radio" name="breakout" value="yes" required> Yes
+                <input type="radio" name="breakout" value="no"> No
+            </div>
+
+            <label>Did this product feel drying?</label>
+            <div class="radio-group">
+                <input type="radio" name="drying" value="yes" required> Yes
+                <input type="radio" name="drying" value="no"> No
+            </div>
+
+            <label>Did this product make your skin oily?</label>
+            <div class="radio-group">
+                <input type="radio" name="oily" value="yes" required> Yes
+                <input type="radio" name="oily" value="no"> No
+            </div>
+
+            <label>Was this product hydrating?</label>
+            <div class="radio-group">
+                <input type="radio" name="hydrating" value="yes" required> Yes
+                <input type="radio" name="hydrating" value="no"> No
+            </div>
+
+            <label>Did this product feel heavy?</label>
+            <div class="radio-group">
+                <input type="radio" name="heavy" value="yes" required> Yes
+                <input type="radio" name="heavy" value="no"> No
+            </div>
+
+            <label>Would you recommend this product?</label>
+            <div class="radio-group">
+                <input type="radio" name="recommend" value="yes" required> Yes
+                <input type="radio" name="recommend" value="no"> No
+            </div>
+
+        </div>
+
+        <button type="submit">Submit Review</button>
+
+    </form>
+
+    <div class="info">
+        <strong>Review Guide:</strong><br>
+        • Breakout → caused acne or irritation<br>
+        • Drying → made skin feel dry/tight<br>
+        • Oily → caused excess shine<br>
+        • Hydrating → helped moisture balance<br>
+        • Heavy → felt thick or greasy<br>
+        • Recommend → would use again
+    </div>
+
+    <a href="{{ url_for('dashboard') }}">DASHBOARD</a>
+
+</div>
+
+</body>
+</html>
